@@ -13,14 +13,14 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
-find_package(ichthus_can_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
 
 include_directories(include)
 
 add_library(can_odometry STATIC src/can_odometry.cpp)
 target_compile_features(can_odometry PRIVATE cxx_std_17)
 ament_target_dependencies(can_odometry rclcpp
-  ichthus_can_msgs geometry_msgs)
+  std_msgs geometry_msgs)
 target_include_directories(can_odometry
   PUBLIC
   # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

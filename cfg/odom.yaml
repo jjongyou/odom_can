@@ -1,0 +1,8 @@
+/IchthusCANKIAReader:
+  ros__parameters:
+    str_ratio: 13.3
+    wheel_base: 2.72
+    to_rad: 0.0174563
+    esp_msg_len: 14
+    whl4_spd_len: 4
+    yaw_rate_idx: 9
