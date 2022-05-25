@@ -3,6 +3,7 @@
 #include <geometry_msgs/msg/twist_with_covariance_stamped.hpp>
 #include <std_msgs/msg/int32.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
+#include <std_msgs/msg/float64.hpp>
 
 #include <memory>
 
@@ -13,6 +14,8 @@ class CANOdometry : public rclcpp::Node
 {
   private:
     rclcpp::Publisher<geometry_msgs::msg::TwistWithCovarianceStamped>::SharedPtr odom_pub;
+    rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr mps_pub;
+
     rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr esp_sub;
     rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr sas_sub;
     rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr whl_spd_sub;

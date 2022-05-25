@@ -17,6 +17,7 @@ CANOdometry::CANOdometry(const rclcpp::NodeOptions & options)
   RCLCPP_INFO(this->get_logger(), "Create Pub & Sub");
 
   odom_pub = this->create_publisher<geometry_msgs::msg::TwistWithCovarianceStamped>("can_odom", 1);
+  mps_pub = this->create_publisher<std_msgs::msg::Float64>("can_mps", 1);
 
   esp_sub = this->create_subscription<std_msgs::msg::Float64MultiArray>(
     "ESP12", 10, std::bind(&CANOdometry::yaw_CB, this, std::placeholders::_1));
@@ -105,22 +106,18 @@ void CANOdometry::yaw_CB(std_msgs::msg::Float64MultiArray::SharedPtr msg)
 
 void CANOdometry::spd_CB(std_msgs::msg::Float64MultiArray::SharedPtr msg)
 {
-  if (!mcm_override)
+  int idx = 0;
+  float curr_kmph = 0;
+  std_msgs::msg::Float64 mps_data;
+  for (auto whl_spd = msg->data.begin(); idx < whl4_spd_len; idx++, whl_spd++)
   {
-    int idx = 0;
-    float curr_kmph = 0;
-    for (auto whl_spd = msg->data.begin(); idx < whl4_spd_len; idx++, whl_spd++)
-    {
-      curr_kmph += *whl_spd;
-    }
-    curr_kmph /= whl4_spd_len;
-    curr_mps = curr_kmph * (1000.0 / 3600.0); 
-    //RCLCPP_INFO(this->get_logger(), "[spd_CB] mps : %f", curr_mps);
+    curr_kmph += *whl_spd;
   }
-  else
-  {
-    RCLCPP_INFO(this->get_logger(), "[spd_CB] MCM Override");
-  }
+  curr_kmph /= whl4_spd_len;
+  curr_mps = curr_kmph * (1000.0 / 3600.0); 
+  mps_data.data = curr_mps;
+  mps_pub->publish(mps_data);
+  //RCLCPP_INFO(this->get_logger(), "[spd_CB] mps : %f", curr_mps);
 }
 
 void CANOdometry::ang_CB(std_msgs::msg::Float64MultiArray::SharedPtr msg)
@@ -138,7 +135,7 @@ void CANOdometry::ang_CB(std_msgs::msg::Float64MultiArray::SharedPtr msg)
 
     curr_theta = curr_ang / str_ratio;
     curr_ang = 0;
-    RCLCPP_INFO(this->get_logger(), "[ang_CB] curr_theta : %f", curr_theta);
+    //RCLCPP_INFO(this->get_logger(), "[ang_CB] curr_theta : %f", curr_theta);
   }
   else
   {
